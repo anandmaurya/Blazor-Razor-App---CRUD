@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeApp.Infrastructre",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeApp.RazorApp", "EmployeeApp.RazorApp\EmployeeApp.RazorApp.csproj", "{54CB2DFF-DB1C-4B80-9A43-27E59A701050}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Output", "Output", "{EFDC0078-BBF3-454C-95FA-6E455BBC65C7}"
+	ProjectSection(SolutionItems) = preProject
+		C:\Users\Dell\Downloads\RazorCrud-Gif.gif = C:\Users\Dell\Downloads\RazorCrud-Gif.gif
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
