@@ -13,5 +13,5 @@ EmployeeApp.Infrastructre\DBchanges\EmployeeApp-Script2.sql
 
 # Demo
 
-![Alt Text]()
+![Alt Text](https://github.com/anandmaurya/BlazorEmployeeCRUD/blob/master/Output/RazorCrud-Gif.gif)
 
