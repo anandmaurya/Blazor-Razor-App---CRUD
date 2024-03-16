@@ -58,9 +58,9 @@ namespace EmployeeApp.Infrastructre.Services
             }
         }
 
-        async Task<Employee> IEmployeeService.GetEmployeeByIdAsync(int id)
+        async Task<EmployeeAdd> IEmployeeService.GetEmployeeByIdAsync(int id)
         {
-            Employee employees = new Employee();
+            EmployeeAdd employees = new EmployeeAdd();
             using (var conn = new SqlConnection(_connectionString))
             {
                 if (conn.State == ConnectionState.Closed)
@@ -70,7 +70,7 @@ namespace EmployeeApp.Infrastructre.Services
                     string query = @"
                             SELECT 
                                 E.ID,
-                                D.DepartmentName,
+                                E.DepartmentID,
                                 E.Name,
                                 E.DOB,
                                E.Gender
@@ -78,8 +78,8 @@ namespace EmployeeApp.Infrastructre.Services
                                 EmployeeMaster E
                             INNER JOIN 
                                 DepartmentMaster D ON E.DepartmentID = D.ID
-                            where E.id={id}";
-                    return employees = await conn.QueryFirstOrDefaultAsync<Employee>(query);
+                            where E.id=@id";
+                    return employees = await conn.QueryFirstOrDefaultAsync<EmployeeAdd>(query, new { ID = id });
                 }
                 catch (Exception)
                 {
@@ -129,15 +129,86 @@ namespace EmployeeApp.Infrastructre.Services
             }
         }
 
-        Task<Employee> IEmployeeService.UpdateEmployeesAsync(int id, Employee employee)
+        async Task<string> IEmployeeService.UpdateEmployeesAsync(EmployeeAdd employee)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+                try
+                {
+                    string updateQuery = @"
+                                    UPDATE EmployeeMaster
+                                    SET Name = @Name,
+                                        DOB = @DOB,
+                                        Gender = @Gender,
+                                        DepartmentID = @DepartmentId
+                                    WHERE ID = @EmployeeId";
+
+                    int rowsAffected = await conn.ExecuteAsync(updateQuery, new
+                    {
+                        Name = employee.Name,
+                        DOB = employee.DOB,
+                        Gender = employee.Gender,
+                        DepartmentId = employee.DepartmentID,
+                        EmployeeId = employee.ID
+                    });
+
+                    if (rowsAffected > 0)
+                    {
+                        return $"Employee with ID {employee.ID} updated successfully.";
+                    }
+                    else
+                    {
+                        return $"Employee with ID {employee.ID} not found or no changes were made.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return $"Error occurred while updating employee: {ex.Message}";
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open)
+                        conn.Close();
+                }
+            }
         }
 
-        Task IEmployeeService.DeleteEmployeesAsync(int id)
+
+        public async Task<string> DeleteEmployeesAsync(int id)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+                try
+                {
+                    string deleteQuery = "DELETE FROM EmployeeMaster WHERE ID = @EmployeeId";
+
+                    int rowsAffected = await conn.ExecuteAsync(deleteQuery, new { EmployeeId = id });
+
+                    if (rowsAffected > 0)
+                    {
+                        return $"Employee with ID {id} deleted successfully.";
+                    }
+                    else
+                    {
+                        return $" Error message: No employee found with the specified {id}";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open)
+                        conn.Close();
+                }
+            }
         }
+
     }
 }
 

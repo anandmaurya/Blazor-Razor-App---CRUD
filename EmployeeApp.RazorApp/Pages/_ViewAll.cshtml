@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Employee>
+<table class="table table-bordered" id="customerTable">
+    <thead>
+        <tr>
+            <th>
+                <input type="checkbox" id="selectAll" />                
+            </th>
+            <th>
+                Name
+            </th>            
+            <th>
+                DOB
+            </th>
+            <th>
+                Department
+            </th>
+            <th>
+                Gender
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count() != 0)
+        {
+            @foreach (var employee in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="rowCheckbox" data-id="@employee.ID" />
+                    </td>
+                    <td>
+                        @employee.Name
+                    </td>
+                    <td>
+                        @employee.DOB.ToString("dd-MMM-yyyy")
+                    </td>
+                    <td>
+                        @employee.DepartmentName
+                    </td>
+                    <td>
+                        @employee.Gender
+                    </td>
+                    <td text-right">
+                        <a onclick="jQueryModalGet('?handler=CreateOrEdit&id=@employee.ID','Edit Employee')" class="btn btn-info text-white"> Edit</a>
+                        <form method="post" asp-page="Index" asp-route-id="@employee.ID" asp-page-handler="Delete" onsubmit="return jQueryModalDelete(this)" class="d-inline">
+                            <button type="submit" class="btn btn-danger text-white"> Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function ()
+    {
+        $("#customerTable").DataTable();
+
+        // Select All functionality
+        $('#selectAll').change(function ()
+        {
+            $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+        });  
+
+    });
+</script>

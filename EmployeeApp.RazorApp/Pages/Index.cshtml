@@ -1,0 +1,103 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4 fw-bold">Razor CRUD</h1>
+</div>
+<div class="card">
+    <div class="col-sm-12 justify-content-between d-flex" style="padding:20px">
+        <button id="viewSelected" class="btn btn-primary">View Selected</button>
+        <div>
+            <a onclick="jQueryModalGet('?handler=CreateOrEdit','Create Employee')" class="btn btn-success">
+                Create
+            </a>
+            <a id="reload" class="btn btn-warning">
+                Reload
+            </a>
+        </div>
+
+    </div>
+    <div id="viewAll" class="card-body table-responsive"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="selectedDataModal" tabindex="-1" role="dialog" aria-labelledby="selectedDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectedDataModalLabel">Selected Employee Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selectedDataModalBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function ()
+        {
+            $('#viewAll').load('?handler=ViewAllPartial');
+
+            // View Selected button click event
+            $('#viewSelected').click(function ()
+            {
+                var selectedData = [];
+                $('.rowCheckbox:checked').each(function ()
+                {
+                    var name = $(this).closest('tr').find('td:eq(1)').text();
+                    var department = $(this).closest('tr').find('td:eq(3)').text();
+                    selectedData.push({ name: name, department: department });
+                });
+
+                // Populate modal with selected data in table format
+                var modalBody = $('#selectedDataModalBody');
+                modalBody.empty();
+                if (selectedData.length > 0)
+                {
+                    selectedData.forEach(function (item)
+                    {
+                        var row = $('<tr><td>' + item.name + '</td><td>' + item.department + '</td></tr>');
+                        modalBody.append(row);
+                    });
+                }
+                else
+                {
+                    alert('Please select at least one employee.');
+                    return;
+                    //modalBody.html('<tr><td colspan="2">No data selected.</td></tr>');
+                }
+
+                // Show the modal
+                $('#selectedDataModal').modal('show');
+            });
+
+        });
+        $(function ()
+        {
+            $('#reload').on('click', function ()
+            {
+                $('#viewAll').load('?handler=ViewAllPartial');
+            });
+        });
+    </script>
+}

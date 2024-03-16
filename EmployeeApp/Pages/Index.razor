@@ -1,19 +1,20 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components
 @inject IJSRuntime JSRuntime
 @inject IJSRuntime JS
-
 <PageTitle>Index</PageTitle>
 
 <h3>Employee</h3>
 @* <SurveyPrompt Title="How is Blazor working for you?" /> *@
 
-<div class="row mb-2 offset-1">
+<div class="row mb-2 justify-content-between">
+    <div class="col-md-3">
+        <button type="button" id="viewSelected" class="btn btn-secondary" @onclick="ViewSelectedRows">Show selected Row</button>
+    </div>
     <div class="col-md-3">
         <button type="button" class="btn btn-primary" @onclick="ShowModal">ADD New</button>
     </div>
-    <div class="col-md-3">
-        <button type="button" class="btn btn-secondary">Show selected Row</button>
-    </div>
+
 </div>
 
 
@@ -23,7 +24,6 @@
 
             <tr>
                 <th class="th-sm">
-                    @* <input type="checkbox" /> *@
                     <input id="chkSelectAll" type="checkbox" @onclick="SelectAll" />
                 </th>
                 <th class="th-sm">
@@ -49,7 +49,7 @@
             {
                 <tr>
                     <td class="th-sm">
-                        <input type="checkbox">
+                        <input type="checkbox" id="rowCheckbox" @bind="@emp.ID">
                     </td>
                     <td class="th-sm">
                         <label>@emp.Name</label>
@@ -61,8 +61,8 @@
                         <label>@emp.DOB.ToString("yyyy-MM-dd")</label>
                     </td>
                     <td class="th-sm">
-                        <button type="button" class="btn btn-primary">Edit</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
+                        <button type="button" class="btn btn-primary" @onclick="@( () => GetEmployeeByID(emp.ID) )">Edit</button>
+                        <button type="button" class="btn btn-danger" @onclick="@( () => ShowConfirmationModal(emp.ID) )">Delete</button>
                     </td>
                 </tr>
             }
@@ -73,38 +73,41 @@
 </div>
 
 
-<!-- Modal -->
+<!-- Add/Edit Modal -->
 <div class="modal" tabindex="-1" style="display: @(IsModalOpen ? "block" : "none")">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Employee</h5>
-            <button type="button" class="close" @onclick="CloseModal">
-            <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
-                <div class="container">
-                    <form>
+
+        <EditForm Model="@employee" OnValidSubmit="CreateEmployee" FormName="employeeForm">
+            <DataAnnotationsValidator />            
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Employee</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal">                        
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+
                         <div class="row mb-3 offset-1">
                             <label for="name" class="col-sm-2 col-form-label">Name:</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" @bind="@employee.Name" id="name" placeholder="Enter Name">
-                                <input type="text" class="form-control" @bind="@SelectedDepartmentId" id="deptID" placeholder="Enter Name">
+                                <InputText class="form-control" @bind-Value="@employee.Name" placeholder="Enter Name"></InputText>
+                                <ValidationMessage For="@(() => employee.Name)" />
                             </div>
                         </div>
                         <div class="row mb-3 offset-1">
                             <label for="dob" class="col-sm-2 col-form-label">DOB:</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="dob" @bind="@employee.DOB">
+                                <InputDate class="form-control" @bind-Value="@employee.DOB"></InputDate>
+                                <ValidationMessage For="@(() => employee.DOB)" />
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label for="department" class="col-sm-2 col-form-label">Department:</label>
                             <div class="col-sm-8 offset-1">
-                                <select class="form-select" id="department" @bind="@employee.DepartmentID">
-                                    <option value="">Select Department</option>
+                                <select class="form-select" id="department" required @bind="@employee.DepartmentID">
+                                    <option value="0">Select Department</option>
                                     @foreach (var dept in Departments)
                                     {
                                         <option value="@dept.ID">@dept.DepartmentName</option>
@@ -117,27 +120,80 @@
                             <label class="col-sm-2 col-form-label">Gender:</label>
                             <div class="col-sm-8 offset-1">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="male" @bind="employee.Gender">
+                                    <input type="radio" checked="@(employee.Gender == 'M')"
+                                           name="Gender" @onchange="@(() => employee.Gender = 'M')" />
                                     <label class="form-check-label" for="male">Male</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="female" @bind="employee.Gender">
-                                    <label class="form-check-label" for="female">Female</label>
+                                    <input type="radio" checked="@(employee.Gender == 'F')"
+                                           name="Gender" @onchange="@(() => employee.Gender = 'F')" />
+                                    <label class="form-check-label" for="male">Female</label>
                                 </div>
+
                             </div>
                         </div>
-                        @*  <div class="row mb-3offset-1">
-                        <div class="col-sm-10 offset-sm-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                        </div> *@
-                    </form>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" value="Save">Save</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                </div>
+
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@* Delete confirmation modal*@
+<div class="modal" tabindex="-1" style="display: @(IsDeleteModalOpen ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Employee</h5>
+                <button type="button" class="btn-close" @onclick="CloseDeleteModal">                    
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    Are you sure you want to delete this record?
                 </div>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="@CreateEmployee" value="Save">Save</button>
-                <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick="DeleteEmployeeByID">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* View Modal *@
+<div class="modal fade" id="selectedDataModal" tabindex="-1" role="dialog" aria-labelledby="selectedDataModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectedDataModalLabel">Selected Employee Data</h5>
+                <button type="button" class="btn-close" @onclick="CloseViewModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selectedDataModalBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseViewModal">Close</button>
             </div>
         </div>
     </div>
@@ -151,5 +207,51 @@
             checkboxes[i].checked = selectAllCheckbox.checked;
         }
     }
+
+    function ViewSelectedRows() {
+        var selectedData = [];
+        var checkboxes = document.querySelectorAll('#rowCheckbox:checked');
+        checkboxes.forEach(function (checkbox) {
+            var name = checkbox.closest('tr').querySelector('td:nth-child(2)').textContent;
+            var department = checkbox.closest('tr').querySelector('td:nth-child(3)').textContent;
+            selectedData.push({ name: name, department: department });
+        });
+
+        var modalBody = document.getElementById('selectedDataModalBody');
+        modalBody.innerHTML = '';
+        if (selectedData.length > 0) {
+            selectedData.forEach(function (item) {
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + item.name + '</td><td>' + item.department + '</td>';
+                modalBody.appendChild(row);
+            });
+        } else {
+            alert('Please select at least one employee.');
+            return;
+            //modalBody.innerHTML = '<tr><td colspan="2">No data selected.</td></tr>';
+        }
+
+        document.getElementById('selectedDataModal').style.display = 'block';
+    }
+
+    function CloseViewModal() {
+        document.getElementById('selectedDataModal').style.display = 'none';
+        DeSelectAll();
+    }
+    function DeSelectAll() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var selectAllCheckbox = document.getElementById('chkSelectAll');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+        }
+    }
+
 </script>
+
+
+@code {
+
+
+
+}
 
