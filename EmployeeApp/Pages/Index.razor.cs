@@ -86,8 +86,9 @@ namespace EmployeeApp.Pages
         protected async Task DeleteEmployeeByID()
         {
             await _employeeService.DeleteEmployeesAsync(idToDelete);
-            CloseDeleteModal();
+            StateHasChanged();
             await GetEmployeeList();
+            CloseDeleteModal();
 
         }
         private void ShowEditModal()
@@ -95,7 +96,8 @@ namespace EmployeeApp.Pages
             IsModalOpen = true;
         }
         private void ShowModal()
-        {           
+        {
+            IsEdit = false;
             IsModalOpen = true;
         }
         private void ClearForm()
@@ -110,6 +112,8 @@ namespace EmployeeApp.Pages
         private void CloseModal()
         {
             IsModalOpen = false;
+            ClearForm();
+            StateHasChanged();
         }
         public async void SelectAll()
         {
@@ -123,6 +127,10 @@ namespace EmployeeApp.Pages
         {
             await JSRuntime.InvokeAsync<string>("CloseViewModal");
         }
+        //public async void DeSelectAll()
+        //{
+        //    await JSRuntime.InvokeAsync<string>("DeSelectAll");
+        //}
     }
 }
 

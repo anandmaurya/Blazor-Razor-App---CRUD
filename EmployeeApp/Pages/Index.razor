@@ -81,7 +81,7 @@
             <DataAnnotationsValidator />            
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Employee</h5>
+                    <h5 class="modal-title">@((IsEdit ? "Edit" : "Add") + " Employee")</h5>
                     <button type="button" class="btn-close" @onclick="CloseModal">                        
                     </button>
                 </div>
@@ -107,7 +107,7 @@
                             <label for="department" class="col-sm-2 col-form-label">Department:</label>
                             <div class="col-sm-8 offset-1">
                                 <select class="form-select" id="department" required @bind="@employee.DepartmentID">
-                                    <option value="0">Select Department</option>
+                                    @* <option value="0">Select Department</option> *@
                                     @foreach (var dept in Departments)
                                     {
                                         <option value="@dept.ID">@dept.DepartmentName</option>
@@ -137,8 +137,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" value="Save">Save</button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                    <button type="submit" class="btn btn-primary" value="Save">@((IsEdit ? "Update" : "Save"))</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
                 </div>
 
             </div>
@@ -151,7 +151,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Employee</h5>
+                <h5 class="modal-title">Delete Employee</h5>
                 <button type="button" class="btn-close" @onclick="CloseDeleteModal">                    
                 </button>
             </div>
@@ -162,15 +162,15 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @onclick="DeleteEmployeeByID">Delete</button>
+                <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
 </div>
 
 @* View Modal *@
-<div class="modal fade" id="selectedDataModal" tabindex="-1" role="dialog" aria-labelledby="selectedDataModal" aria-hidden="true">
+<div class="modal" id="selectedDataModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

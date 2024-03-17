@@ -25,6 +25,8 @@ namespace EmployeeApp.Infrastructre.Model
         public EmployeeAdd()
         {
             this.DOB = DateTime.Now.Date.AddYears(-10);
+            this.DepartmentID = 1;
+            this.Gender = 'M';
         }
     }
 }
