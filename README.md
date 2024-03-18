@@ -1,10 +1,10 @@
 
 
-# ASPCore.BlazorCrud
+# ASPCore.Crud & Blazor.Crud
 
-I have created Razor and Blazor Project within same Solution to perform CRUD operations.
+I have created Razor and Blazor Projects within the same Solution to perform CRUD operations using Dapper and SQL as the Backend.
 
-We will use Visual Studio 2022 and SQL Server 2017.
+I have used Visual Studio 2022 and SQL Server 2019.
 
 # Database
  
